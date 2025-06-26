@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
-import userRouter from './routes/users';
+import usersRouter from './routes/users';
+import cardsRouter from './routes/cards';
 
 const { PORT = 3000 } = process.env;
 
@@ -18,6 +19,7 @@ app.use((req: Request, _: Response, next: NextFunction) => {
   next();
 });
 
-app.use('/users', userRouter);
+app.use('/users', usersRouter);
+app.use('/cards', cardsRouter);
 
 app.listen(PORT);
