@@ -10,19 +10,21 @@ const {
 
 const app = express();
 
-mongoose.connect(MONGODB_URL);
+mongoose.connect(MONGODB_URL)
+  .then(() => {
+    app.use(express.json());
 
-app.use(express.json());
+    app.use((req: Request, _: Response, next: NextFunction) => {
+      req.user = {
+        _id: '685e922ddfce7e5c7a8a21e1',
+      };
 
-app.use((req: Request, _: Response, next: NextFunction) => {
-  req.user = {
-    _id: '685e922ddfce7e5c7a8a21e1',
-  };
+      next();
+    });
 
-  next();
-});
+    app.use('/users', usersRouter);
+    app.use('/cards', cardsRouter);
 
-app.use('/users', usersRouter);
-app.use('/cards', cardsRouter);
-
-app.listen(PORT);
+    app.listen(PORT);
+  })
+  .catch(() => process.exit(1));

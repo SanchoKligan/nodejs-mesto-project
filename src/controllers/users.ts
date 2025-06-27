@@ -33,7 +33,7 @@ export const createUser = async (req: Request, res: Response) => {
     .then((user) => res.json(user))
     .catch((err: unknown) => {
       if (err instanceof Error.ValidationError) {
-        res.status(400).json({ message: 'Переданы некорретные данные для создания пользователя' });
+        res.status(400).json({ message: 'Переданы некорректные данные для создания пользователя' });
       } else {
         res.status(500).json({ message: 'Внутренняя ошибка сервера' });
       }
@@ -53,7 +53,7 @@ export const updateProfile = async (req: Request, res: Response) => {
     })
     .catch((err: unknown) => {
       if (err instanceof Error.ValidationError) {
-        res.status(400).json({ message: 'Переданы некорретные данные для обновления профиля' });
+        res.status(400).json({ message: 'Переданы некорректные данные для обновления профиля' });
       } else {
         res.status(500).json({ message: 'Внутренняя ошибка сервера' });
       }
@@ -73,7 +73,7 @@ export const updateAvatar = async (req: Request, res: Response) => {
     })
     .catch((err: unknown) => {
       if (err instanceof Error.ValidationError) {
-        res.status(400).json({ message: 'Переданы некорретные данные для обновления аватара' });
+        res.status(400).json({ message: 'Переданы некорректные данные для обновления аватара' });
       } else {
         res.status(500).json({ message: 'Внутренняя ошибка сервера' });
       }
