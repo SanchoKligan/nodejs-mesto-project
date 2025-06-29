@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { Error } from 'mongoose';
+import bcrypt from 'bcrypt';
 import User from '../models/user';
 import StatusCodes from '../constants';
 
@@ -38,9 +39,11 @@ export const getUserById = async (req: Request, res: Response) => {
 };
 
 export const createUser = async (req: Request, res: Response) => {
-  const { name, about, avatar } = req.body;
+  const { password, ...restBody } = req.body;
 
-  await User.create({ name, about, avatar })
+  const hash = await bcrypt.hash(password, 10);
+
+  await User.create({ password: hash, ...restBody })
     .then((user) => {
       res
         .status(StatusCodes.CREATED)

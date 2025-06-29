@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { isEmail } from 'validator';
 
 type User = {
   name: string,
@@ -8,21 +9,34 @@ type User = {
 
 const schema = new mongoose.Schema(
   {
-    name: {
+    email: {
       type: String,
       required: true,
+      unique: true,
+      validate: {
+        validator: (v: string) => isEmail(v),
+        message: 'Некорректный формат почты: {VALUE}',
+      },
+    },
+    password: {
+      type: String,
+      required: true,
+    },
+    name: {
+      type: String,
       minlength: 2,
       maxlength: 30,
+      default: 'Жак-Ив Кусто',
     },
     about: {
       type: String,
-      required: true,
       minlength: 2,
       maxlength: 200,
+      default: 'Исследователь',
     },
     avatar: {
       type: String,
-      required: true,
+      default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     },
   },
   { versionKey: false },
