@@ -1,4 +1,5 @@
 import { model, Schema, Document } from 'mongoose';
+import AVATAR_REGEX from '../constants/regex';
 
 interface ICard extends Document {
   name: string,
@@ -19,6 +20,9 @@ const schema = new Schema<ICard>(
     link: {
       type: String,
       required: true,
+      validate: {
+        validator: (v: string) => AVATAR_REGEX.test(v),
+      },
     },
     owner: {
       type: Schema.Types.ObjectId,

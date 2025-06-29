@@ -7,6 +7,7 @@ import {
 import { isEmail } from 'validator';
 import { compare } from 'bcrypt';
 import { UnauthorizedError } from '../errors';
+import AVATAR_REGEX from '../constants/regex';
 
 interface IUser extends Document {
   email: string;
@@ -33,7 +34,6 @@ const schema = new Schema<IUser>(
       unique: true,
       validate: {
         validator: (v: string) => isEmail(v),
-        message: 'Некорректный формат почты: {VALUE}',
       },
     },
     password: {
@@ -56,6 +56,9 @@ const schema = new Schema<IUser>(
     avatar: {
       type: String,
       default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+      validate: {
+        validator: (v: string) => AVATAR_REGEX.test(v),
+      },
     },
   },
   { versionKey: false },
