@@ -1,9 +1,10 @@
 /* eslint-disable no-unused-vars */
+import { JwtPayload } from 'jsonwebtoken';
 
-declare namespace Express {
-   export interface Request {
-      user?: {
-        _id: string,
+declare global {
+   namespace Express {
+      export interface Request {
+         user: JwtPayload
       }
    }
 }

@@ -1,14 +1,14 @@
-import mongoose from 'mongoose';
+import { model, Schema, Document } from 'mongoose';
 
-type Card = {
+interface ICard extends Document {
   name: string,
   link: string,
-  owner: mongoose.Schema.Types.ObjectId,
-  likes: mongoose.Schema.Types.ObjectId[],
+  owner: Schema.Types.ObjectId,
+  likes: Schema.Types.ObjectId[],
   createdAt: Date
-};
+}
 
-const schema = new mongoose.Schema(
+const schema = new Schema<ICard>(
   {
     name: {
       type: String,
@@ -21,13 +21,13 @@ const schema = new mongoose.Schema(
       required: true,
     },
     owner: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: 'user',
       required: true,
     },
     likes: {
       type: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'user',
       }],
       default: [],
@@ -40,4 +40,4 @@ const schema = new mongoose.Schema(
   { versionKey: false },
 );
 
-export default mongoose.model<Card>('card', schema);
+export default model<ICard>('Card', schema);

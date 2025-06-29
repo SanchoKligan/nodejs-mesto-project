@@ -1,13 +1,30 @@
-import mongoose from 'mongoose';
+import {
+  model,
+  Model,
+  Schema,
+  Document,
+} from 'mongoose';
 import { isEmail } from 'validator';
+import { compare } from 'bcrypt';
 
-type User = {
-  name: string,
-  about: string,
-  avatar: string
-};
+interface IUser extends Document {
+  email: string;
+  password: string;
+  name: string;
+  about: string;
+  avatar: string;
+}
 
-const schema = new mongoose.Schema(
+interface IUserModel extends Model<IUser> {
+  /* eslint-disable no-unused-vars */
+  findUserByCredentials(
+    email: string,
+    password: string
+  ): Promise<IUser | null>;
+  /* eslint-enable no-unused-vars */
+}
+
+const schema = new Schema<IUser>(
   {
     email: {
       type: String,
@@ -42,4 +59,25 @@ const schema = new mongoose.Schema(
   { versionKey: false },
 );
 
-export default mongoose.model<User>('user', schema);
+schema.static(
+  'findUserByCredentials',
+  function findUserByCredentials(this: Model<IUser>, email: string, password: string) {
+    return this.findOne({ email })
+      .then((user) => {
+        if (!user) {
+          return Promise.reject(new Error('Неверные почта или пароль'));
+        }
+
+        return compare(password, user.password)
+          .then((matched) => {
+            if (!matched) {
+              return Promise.reject(new Error('Неверные почта или пароль'));
+            }
+
+            return user;
+          });
+      });
+  },
+);
+
+export default model<IUser, IUserModel>('User', schema);

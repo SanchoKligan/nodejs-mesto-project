@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
 import { Error } from 'mongoose';
-import bcrypt from 'bcrypt';
+import { hash } from 'bcrypt';
+import { sign } from 'jsonwebtoken';
 import User from '../models/user';
 import StatusCodes from '../constants';
 
-export const getAllUsers = async (_: Request, res: Response) => {
-  await User.find({})
+export const getAllUsers = (_: Request, res: Response) => {
+  User.find({})
     .then((users) => res.json(users))
     .catch(() => {
       res
@@ -14,8 +15,8 @@ export const getAllUsers = async (_: Request, res: Response) => {
     });
 };
 
-export const getUserById = async (req: Request, res: Response) => {
-  await User.findById(req.params.userId)
+export const getUserById = (req: Request, res: Response) => {
+  User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
         res
@@ -38,12 +39,11 @@ export const getUserById = async (req: Request, res: Response) => {
     });
 };
 
-export const createUser = async (req: Request, res: Response) => {
+export const createUser = (req: Request, res: Response) => {
   const { password, ...restBody } = req.body;
 
-  const hash = await bcrypt.hash(password, 10);
-
-  await User.create({ password: hash, ...restBody })
+  hash(password, 10)
+    .then((pass) => User.create({ password: pass, ...restBody }))
     .then((user) => {
       res
         .status(StatusCodes.CREATED)
@@ -62,10 +62,10 @@ export const createUser = async (req: Request, res: Response) => {
     });
 };
 
-export const updateProfile = async (req: Request, res: Response) => {
+export const updateProfile = (req: Request, res: Response) => {
   const { name, about } = req.body;
 
-  await User.findByIdAndUpdate(req.user?._id, { name, about }, { new: true, runValidators: true })
+  User.findByIdAndUpdate(req.user?._id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         res
@@ -88,10 +88,10 @@ export const updateProfile = async (req: Request, res: Response) => {
     });
 };
 
-export const updateAvatar = async (req: Request, res: Response) => {
+export const updateAvatar = (req: Request, res: Response) => {
   const { avatar } = req.body;
 
-  await User.findByIdAndUpdate(req.user?._id, { avatar }, { new: true, runValidators: true })
+  User.findByIdAndUpdate(req.user?._id, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
         res
@@ -111,5 +111,21 @@ export const updateAvatar = async (req: Request, res: Response) => {
           .status(StatusCodes.INTERNAL_SERVER_ERROR)
           .json({ message: 'На сервере произошла ошибка' });
       }
+    });
+};
+
+export const login = (req: Request, res: Response) => {
+  const { email, password } = req.body;
+
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = sign({ _id: user?._id }, 'key', { expiresIn: '7d' });
+
+      res.cookie('token', token, { httpOnly: true });
+    })
+    .catch(() => {
+      res
+        .status(StatusCodes.UNAUTHORIZED)
+        .json({ message: 'Ошибка авторизации' });
     });
 };

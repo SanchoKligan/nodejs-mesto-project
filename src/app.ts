@@ -1,7 +1,9 @@
-import express, { Request, Response, NextFunction } from 'express';
+import express from 'express';
 import mongoose from 'mongoose';
 import usersRouter from './routes/users';
 import cardsRouter from './routes/cards';
+import { login, createUser } from './controllers/users';
+import auth from './middlewares/auth';
 
 const {
   PORT = 3000,
@@ -14,13 +16,10 @@ mongoose.connect(MONGODB_URL)
   .then(() => {
     app.use(express.json());
 
-    app.use((req: Request, _: Response, next: NextFunction) => {
-      req.user = {
-        _id: '685e922ddfce7e5c7a8a21e1',
-      };
+    app.post('/signin', login);
+    app.post('/signup', createUser);
 
-      next();
-    });
+    app.use(auth);
 
     app.use('/users', usersRouter);
     app.use('/cards', cardsRouter);
