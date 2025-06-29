@@ -1,5 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
+import cookieParser from 'cookie-parser';
 import usersRouter from './routes/users';
 import cardsRouter from './routes/cards';
 import { login, createUser } from './controllers/users';
@@ -17,6 +18,7 @@ const app = express();
 mongoose.connect(MONGODB_URL)
   .then(() => {
     app.use(express.json());
+    app.use(cookieParser());
 
     app.use(logger.reqLogger);
 
