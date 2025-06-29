@@ -4,6 +4,7 @@ import usersRouter from './routes/users';
 import cardsRouter from './routes/cards';
 import { login, createUser } from './controllers/users';
 import auth from './middlewares/auth';
+import logger from './middlewares/logger';
 
 const {
   PORT = 3000,
@@ -15,6 +16,7 @@ const app = express();
 mongoose.connect(MONGODB_URL)
   .then(() => {
     app.use(express.json());
+    app.use(logger.reqLogger);
 
     app.post('/signin', login);
     app.post('/signup', createUser);
@@ -23,6 +25,8 @@ mongoose.connect(MONGODB_URL)
 
     app.use('/users', usersRouter);
     app.use('/cards', cardsRouter);
+
+    app.use(logger.errLogger);
 
     app.listen(PORT);
   })

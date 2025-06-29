@@ -62,22 +62,16 @@ const schema = new Schema<IUser>(
 
 schema.static(
   'findUserByCredentials',
-  function findUserByCredentials(this: Model<IUser>, email: string, password: string) {
-    return this.findOne({ email }).select('+password')
-      .then((user) => {
-        if (!user) {
-          return Promise.reject(new Error('Неверные почта или пароль'));
-        }
-
-        return compare(password, user.password)
-          .then((matched) => {
-            if (!matched) {
-              return Promise.reject(new Error('Неверные почта или пароль'));
-            }
-
-            return user;
-          });
-      });
+  async function findUserByCredentials(this: Model<IUser>, email: string, password: string) {
+    const user = await this.findOne({ email }).select('+password');
+    if (!user) {
+      return Promise.reject(new Error('Неверные почта или пароль'));
+    }
+    const matched = await compare(password, user.password);
+    if (!matched) {
+      return Promise.reject(new Error('Неверные почта или пароль'));
+    }
+    return user;
   },
 );
 
