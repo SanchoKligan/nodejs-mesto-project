@@ -38,6 +38,7 @@ const schema = new Schema<IUser>(
     password: {
       type: String,
       required: true,
+      select: false,
     },
     name: {
       type: String,
@@ -62,7 +63,7 @@ const schema = new Schema<IUser>(
 schema.static(
   'findUserByCredentials',
   function findUserByCredentials(this: Model<IUser>, email: string, password: string) {
-    return this.findOne({ email })
+    return this.findOne({ email }).select('+password')
       .then((user) => {
         if (!user) {
           return Promise.reject(new Error('Неверные почта или пароль'));

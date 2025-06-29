@@ -129,3 +129,13 @@ export const login = (req: Request, res: Response) => {
         .json({ message: 'Ошибка авторизации' });
     });
 };
+
+export const getCurrentUser = (req: Request, res: Response) => {
+  User.findById(req.user?._id)
+    .then((user) => res.json(user))
+    .catch(() => {
+      res
+        .status(StatusCodes.INTERNAL_SERVER_ERROR)
+        .json({ message: 'На сервере произошла ошибка' });
+    });
+};

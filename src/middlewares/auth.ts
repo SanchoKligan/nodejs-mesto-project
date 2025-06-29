@@ -6,9 +6,11 @@ export default (req: Request, res: Response, next: NextFunction) => {
   const { token } = req.cookies.token;
 
   if (!token) {
-    return res
+    res
       .status(StatusCodes.UNAUTHORIZED)
       .json({ message: 'Требуется авторизация' });
+
+    return;
   }
 
   let payload: JwtPayload;
@@ -16,12 +18,14 @@ export default (req: Request, res: Response, next: NextFunction) => {
   try {
     payload = verify(token, 'key') as JwtPayload;
   } catch {
-    return res
+    res
       .status(StatusCodes.UNAUTHORIZED)
       .json({ message: 'Требуется авторизация' });
+
+    return;
   }
 
   req.user = payload;
 
-  return next();
+  next();
 };

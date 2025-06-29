@@ -3,8 +3,8 @@ import { Error } from 'mongoose';
 import StatusCodes from '../constants';
 import Card from '../models/card';
 
-export const getAllCards = async (_: Request, res: Response) => {
-  await Card.find({})
+export const getAllCards = (_: Request, res: Response) => {
+  Card.find({})
     .then((cards) => res.json(cards))
     .catch(() => {
       res
@@ -13,11 +13,11 @@ export const getAllCards = async (_: Request, res: Response) => {
     });
 };
 
-export const createCard = async (req: Request, res: Response) => {
+export const createCard = (req: Request, res: Response) => {
   const { name, link } = req.body;
   const owner = req.user?._id;
 
-  await Card.create({ name, link, owner })
+  Card.create({ name, link, owner })
     .then((card) => {
       res
         .status(StatusCodes.CREATED)
@@ -36,13 +36,17 @@ export const createCard = async (req: Request, res: Response) => {
     });
 };
 
-export const deleteCardById = async (req: Request, res: Response) => {
-  await Card.findByIdAndDelete(req.params.cardId)
+export const deleteCardById = (req: Request, res: Response) => {
+  Card.findByIdAndDelete(req.params.cardId)
     .then((card) => {
       if (!card) {
         res
           .status(StatusCodes.NOT_FOUND)
           .json({ message: 'Карточка с указанным id не найдена' });
+      } else if (card.owner.toString() !== req.user._id.toString()) {
+        res
+          .status(StatusCodes.FORBIDDEN)
+          .json({ message: 'Нет доступа к карточке' });
       } else {
         res.json({ message: 'Карточка успешно удалена' });
       }
@@ -60,8 +64,8 @@ export const deleteCardById = async (req: Request, res: Response) => {
     });
 };
 
-export const setLike = async (req: Request, res: Response) => {
-  await Card.findByIdAndUpdate(
+export const setLike = (req: Request, res: Response) => {
+  Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user?._id } },
     { new: true, runValidators: true },
@@ -92,8 +96,8 @@ export const setLike = async (req: Request, res: Response) => {
     });
 };
 
-export const unsetLike = async (req: Request, res: Response) => {
-  await Card.findByIdAndUpdate(
+export const unsetLike = (req: Request, res: Response) => {
+  Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user?._id } },
     { new: true, runValidators: true },
