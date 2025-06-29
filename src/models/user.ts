@@ -6,6 +6,7 @@ import {
 } from 'mongoose';
 import { isEmail } from 'validator';
 import { compare } from 'bcrypt';
+import { UnauthorizedError } from '../errors';
 
 interface IUser extends Document {
   email: string;
@@ -65,11 +66,11 @@ schema.static(
   async function findUserByCredentials(this: Model<IUser>, email: string, password: string) {
     const user = await this.findOne({ email }).select('+password');
     if (!user) {
-      return Promise.reject(new Error('Неверные почта или пароль'));
+      return Promise.reject(new UnauthorizedError('Неверные почта или пароль'));
     }
     const matched = await compare(password, user.password);
     if (!matched) {
-      return Promise.reject(new Error('Неверные почта или пароль'));
+      return Promise.reject(new UnauthorizedError('Неверные почта или пароль'));
     }
     return user;
   },

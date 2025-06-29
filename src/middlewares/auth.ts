@@ -1,33 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
 import { verify, JwtPayload } from 'jsonwebtoken';
-import StatusCodes from '../constants';
+import { UnauthorizedError } from '../errors';
 
 const { JWT_KEY = 'secret-key' } = process.env;
 
-export default (req: Request, res: Response, next: NextFunction) => {
+export default (req: Request, _: Response, next: NextFunction) => {
   const token = req.cookies?.token;
 
   if (!token) {
-    res
-      .status(StatusCodes.UNAUTHORIZED)
-      .json({ message: 'Требуется авторизация' });
-
-    return;
+    return next(new UnauthorizedError('Требуется авторизация'));
   }
 
   let payload: JwtPayload;
 
   try {
     payload = verify(token, JWT_KEY) as JwtPayload;
+
+    req.user = payload;
+
+    return next();
   } catch {
-    res
-      .status(StatusCodes.UNAUTHORIZED)
-      .json({ message: 'Требуется авторизация' });
-
-    return;
+    return next(new UnauthorizedError('Требуется авторизация'));
   }
-
-  req.user = payload;
-
-  next();
 };

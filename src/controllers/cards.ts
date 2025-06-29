@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { Error } from 'mongoose';
-import StatusCodes from '../constants';
+import StatusCodes from '../constants/status-codes';
 import Card from '../models/card';
 
 export const getAllCards = (_: Request, res: Response) => {
