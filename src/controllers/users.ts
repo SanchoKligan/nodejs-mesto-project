@@ -5,6 +5,8 @@ import { sign } from 'jsonwebtoken';
 import User from '../models/user';
 import StatusCodes from '../constants';
 
+const { JWT_KEY = 'secret-key' } = process.env;
+
 export const getAllUsers = (_: Request, res: Response) => {
   User.find({})
     .then((users) => res.json(users))
@@ -119,7 +121,7 @@ export const login = (req: Request, res: Response) => {
 
   User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = sign({ _id: user?._id }, 'key', { expiresIn: '7d' });
+      const token = sign({ _id: user?._id }, JWT_KEY, { expiresIn: '7d' });
 
       res.cookie('token', token, { httpOnly: true });
     })

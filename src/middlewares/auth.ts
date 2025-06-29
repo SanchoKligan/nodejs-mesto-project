@@ -2,8 +2,10 @@ import { Request, Response, NextFunction } from 'express';
 import { verify, JwtPayload } from 'jsonwebtoken';
 import StatusCodes from '../constants';
 
+const { JWT_KEY = 'secret-key' } = process.env;
+
 export default (req: Request, res: Response, next: NextFunction) => {
-  const { token } = req.cookies.token;
+  const token = req.cookies?.token;
 
   if (!token) {
     res
@@ -16,7 +18,7 @@ export default (req: Request, res: Response, next: NextFunction) => {
   let payload: JwtPayload;
 
   try {
-    payload = verify(token, 'key') as JwtPayload;
+    payload = verify(token, JWT_KEY) as JwtPayload;
   } catch {
     res
       .status(StatusCodes.UNAUTHORIZED)
