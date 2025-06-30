@@ -64,18 +64,29 @@ const schema = new Schema<IUser>(
   { versionKey: false },
 );
 
+schema.methods.toJSON = function toJSON() {
+  const obj = this.toObject();
+  delete obj.password;
+  return obj;
+};
+
 schema.static(
   'findUserByCredentials',
   async function findUserByCredentials(this: Model<IUser>, email: string, password: string) {
     const user = await this.findOne({ email }).select('+password');
+
     if (!user) {
       return Promise.reject(new UnauthorizedError('Неверные почта или пароль'));
     }
-    const matched = await compare(password, user.password);
+
+    const { password: userPass, ...userWithoutPass } = user.toObject?.() || null;
+    const matched = await compare(password, userPass);
+
     if (!matched) {
       return Promise.reject(new UnauthorizedError('Неверные почта или пароль'));
     }
-    return user;
+
+    return userWithoutPass;
   },
 );
 
