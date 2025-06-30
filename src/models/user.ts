@@ -7,7 +7,7 @@ import {
 import { isEmail } from 'validator';
 import { compare } from 'bcrypt';
 import { UnauthorizedError } from '../errors';
-import { AVATAR_REGEX } from '../constants/regex';
+import { AVATAR_REGEX } from '../constants/regex-patterns';
 
 interface IUser extends Document {
   email: string;

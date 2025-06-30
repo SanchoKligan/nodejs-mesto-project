@@ -1,5 +1,5 @@
 import { model, Schema, Document } from 'mongoose';
-import { AVATAR_REGEX } from '../constants/regex';
+import { AVATAR_REGEX } from '../constants/regex-patterns';
 
 interface ICard extends Document {
   name: string,

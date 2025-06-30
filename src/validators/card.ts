@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AVATAR_REGEX, OBJECT_ID_REGEX } from '../constants/regex';
+import { AVATAR_REGEX, OBJECT_ID_REGEX } from '../constants/regex-patterns';
 
 export const paramsSchema = z.object({
   cardId: z.string().regex(OBJECT_ID_REGEX),

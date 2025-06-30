@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { AVATAR_REGEX, OBJECT_ID_REGEX } from '../constants/regex';
+import { AVATAR_REGEX, OBJECT_ID_REGEX } from '../constants/regex-patterns';
 
 export const paramsSchema = z.object({
   userId: z.string().regex(OBJECT_ID_REGEX),
@@ -16,8 +16,5 @@ export const createSchema = z.object({
 export const updateSchema = z.object({
   name: z.string().min(2).max(30).optional(),
   about: z.string().min(2).max(200).optional(),
-});
-
-export const updateAvatarSchema = z.object({
   avatar: z.string().regex(AVATAR_REGEX).optional(),
 });
