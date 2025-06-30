@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import StatusCodes from '../constants/status-codes';
 
 interface ApiError extends Error {
@@ -6,7 +6,8 @@ interface ApiError extends Error {
   message: string;
 }
 
-export default (err: ApiError, _: Request, res: Response) => {
+// eslint-disable-next-line no-unused-vars
+export default (err: ApiError, _req: Request, res: Response, _next: NextFunction) => {
   const statusCode = err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR;
   const message = statusCode === 500
     ? 'На сервере произошла ошибка'

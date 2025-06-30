@@ -107,8 +107,10 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
       res.cookie('token', token, {
         httpOnly: true,
         sameSite: true,
-        maxAge: 60 * 60 * 24 * 7,
+        maxAge: 1000 * 60 * 60 * 24 * 7,
       });
+
+      res.json(user);
     })
     .catch((err: errors.UnauthorizedError) => {
       next(err);
