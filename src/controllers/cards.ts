@@ -33,13 +33,14 @@ export const createCard = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const deleteCardById = (req: Request, res: Response, next: NextFunction) => {
-  Card.findByIdAndDelete(req.params.cardId)
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
         next(new errors.NotFoundError(cardErrorMessages.ID_NOT_FOUND));
       } else if (card.owner.toString() !== req.user._id.toString()) {
         next(new errors.ForbiddenError(cardErrorMessages.DELETION_FORBIDDEN));
       } else {
+        card.deleteOne();
         res.json({ message: 'Карточка успешно удалена' });
       }
     })
