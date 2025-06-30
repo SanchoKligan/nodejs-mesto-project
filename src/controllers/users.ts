@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { Error as MongoError } from 'mongoose';
-import { MongoServerError } from 'mongodb';
+import { mongo, Error as MongoError } from 'mongoose';
 import { hash } from 'bcrypt';
 import { sign } from 'jsonwebtoken';
 import User from '../models/user';
@@ -47,7 +46,7 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
         .json(user);
     })
     .catch((err: unknown) => {
-      if (err instanceof MongoServerError && err.code === 11000) {
+      if (err instanceof mongo.MongoServerError && err.code === 11000) {
         next(new errors.ConflictError(userErrorMessages.EMAIL_CONFLICT));
       } else if (err instanceof MongoError.ValidationError) {
         next(new errors.BadRequestError(userErrorMessages.DATA_BAD_REQUEST));
