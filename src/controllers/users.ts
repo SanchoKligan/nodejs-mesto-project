@@ -104,7 +104,11 @@ export const login = (req: Request, res: Response, next: NextFunction) => {
     .then((user) => {
       const token = sign({ _id: user?._id }, JWT_KEY, { expiresIn: '7d' });
 
-      res.cookie('token', token, { httpOnly: true });
+      res.cookie('token', token, {
+        httpOnly: true,
+        sameSite: true,
+        maxAge: 60 * 60 * 24 * 7,
+      });
     })
     .catch((err: errors.UnauthorizedError) => {
       next(err);

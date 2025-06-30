@@ -1,6 +1,9 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import mongoose from 'mongoose';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
+import rateLimit from 'express-rate-limit';
+import { NotFoundError } from './errors';
 import { userErrorMessages } from './constants/errors-messages';
 import { createSchema as validationSchema } from './validators/user';
 import usersRouter from './routes/users';
@@ -16,10 +19,17 @@ const {
   MONGODB_URL = 'mongodb://localhost:27017/mestodb',
 } = process.env;
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+});
+
 const app = express();
 
 mongoose.connect(MONGODB_URL)
   .then(() => {
+    app.use(helmet());
+    app.use(limiter);
     app.use(express.json());
     app.use(cookieParser());
 
@@ -46,10 +56,13 @@ mongoose.connect(MONGODB_URL)
 
     app.use('/users', usersRouter);
     app.use('/cards', cardsRouter);
-
-    app.use(errorHandler);
+    app.use('*', (_req: Request, _res: Response, next: NextFunction) => {
+      next(new NotFoundError('Такого пути не существует'));
+    });
 
     app.use(logger.errLogger);
+
+    app.use(errorHandler);
 
     app.listen(PORT);
   })
