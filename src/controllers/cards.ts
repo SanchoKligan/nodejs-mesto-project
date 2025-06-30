@@ -3,6 +3,7 @@ import { Error as MongoError } from 'mongoose';
 import * as errors from '../errors';
 import StatusCodes from '../constants/status-codes';
 import Card from '../models/card';
+import { cardErrorMessages } from '../constants/errors-messages';
 
 export const getAllCards = (_: Request, res: Response, next: NextFunction) => {
   Card.find({})
@@ -24,7 +25,7 @@ export const createCard = (req: Request, res: Response, next: NextFunction) => {
     })
     .catch((err: unknown) => {
       if (err instanceof MongoError.ValidationError) {
-        next(new errors.BadRequestError('Переданы некорректные данные для создания карточки'));
+        next(new errors.BadRequestError(cardErrorMessages.DATA_BAD_REQUEST));
       } else {
         next(new Error());
       }
@@ -35,16 +36,16 @@ export const deleteCardById = (req: Request, res: Response, next: NextFunction) 
   Card.findByIdAndDelete(req.params.cardId)
     .then((card) => {
       if (!card) {
-        next(new errors.NotFoundError('Карточка с указанным id не найдена'));
+        next(new errors.NotFoundError(cardErrorMessages.ID_NOT_FOUND));
       } else if (card.owner.toString() !== req.user._id.toString()) {
-        next(new errors.ForbiddenError('Нет доступа к карточке'));
+        next(new errors.ForbiddenError(cardErrorMessages.DELETION_FORBIDDEN));
       } else {
         res.json({ message: 'Карточка успешно удалена' });
       }
     })
     .catch((err: unknown) => {
       if (err instanceof MongoError.CastError) {
-        next(new errors.BadRequestError('Передан некорректный id карточки'));
+        next(new errors.BadRequestError(cardErrorMessages.ID_BAD_REQUEST));
       } else {
         next(new Error());
       }
@@ -59,16 +60,16 @@ export const setLike = (req: Request, res: Response, next: NextFunction) => {
   )
     .then((card) => {
       if (!card) {
-        next(new errors.NotFoundError('Карточка с указанным id не найдена'));
+        next(new errors.NotFoundError(cardErrorMessages.ID_NOT_FOUND));
       } else {
         res.json(card);
       }
     })
     .catch((err: unknown) => {
       if (err instanceof MongoError.ValidationError) {
-        next(new errors.BadRequestError('Переданы некорректные данные для постановки лайка'));
+        next(new errors.BadRequestError(cardErrorMessages.LIKE_BAD_REQUEST));
       } else if (err instanceof MongoError.CastError) {
-        next(new errors.BadRequestError('Передан некорректный id карточки'));
+        next(new errors.BadRequestError(cardErrorMessages.ID_BAD_REQUEST));
       } else {
         next(new Error());
       }
@@ -83,16 +84,16 @@ export const unsetLike = (req: Request, res: Response, next: NextFunction) => {
   )
     .then((card) => {
       if (!card) {
-        next(new errors.NotFoundError('Карточка с указанным id не найдена'));
+        next(new errors.NotFoundError(cardErrorMessages.ID_NOT_FOUND));
       } else {
         res.json(card);
       }
     })
     .catch((err: unknown) => {
       if (err instanceof MongoError.ValidationError) {
-        next(new errors.BadRequestError('Переданы некорректные данные для снятия лайка'));
+        next(new errors.BadRequestError(cardErrorMessages.DISLIKE_BAD_REQUEST));
       } else if (err instanceof MongoError.CastError) {
-        next(new errors.BadRequestError('Передан некорректный id карточки'));
+        next(new errors.BadRequestError(cardErrorMessages.ID_BAD_REQUEST));
       } else {
         next(new Error());
       }

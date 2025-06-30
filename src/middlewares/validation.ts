@@ -4,8 +4,8 @@ import { BadRequestError } from '../errors';
 
 export default (
   schema: z.ZodSchema,
-  source: 'body' | 'params',
   message: string,
+  source: 'body' | 'params' = 'body',
 ) => (req: Request, _: Response, next: NextFunction) => {
   const data = source === 'body' ? req.body : req.params;
   const result = schema.safeParse(data);

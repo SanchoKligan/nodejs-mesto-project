@@ -6,6 +6,7 @@ import { sign } from 'jsonwebtoken';
 import User from '../models/user';
 import StatusCodes from '../constants/status-codes';
 import * as errors from '../errors';
+import { userErrorMessages } from '../constants/errors-messages';
 
 const { JWT_KEY = 'secret-key' } = process.env;
 
@@ -21,14 +22,14 @@ export const getUserById = (req: Request, res: Response, next: NextFunction) => 
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
-        next(new errors.NotFoundError('Пользователь с указанным id не найден'));
+        next(new errors.NotFoundError(userErrorMessages.ID_NOT_FOUND));
       } else {
         res.json(user);
       }
     })
     .catch((err: unknown) => {
       if (err instanceof MongoError.CastError) {
-        next(new errors.BadRequestError('Передан некорректный id пользователя'));
+        next(new errors.BadRequestError(userErrorMessages.ID_BAD_REQUEST));
       } else {
         next(new Error());
       }
@@ -47,9 +48,9 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
     })
     .catch((err: unknown) => {
       if (err instanceof MongoServerError && err.code === 11000) {
-        next(new errors.ConflictError('Такой email уже существует'));
+        next(new errors.ConflictError(userErrorMessages.EMAIL_CONFLICT));
       } else if (err instanceof MongoError.ValidationError) {
-        next(new errors.BadRequestError('Переданы некорректные данные для создания пользователя'));
+        next(new errors.BadRequestError(userErrorMessages.DATA_BAD_REQUEST));
       } else {
         next(new Error());
       }
@@ -62,14 +63,14 @@ export const updateProfile = (req: Request, res: Response, next: NextFunction) =
   User.findByIdAndUpdate(req.user?._id, { name, about }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        next(new errors.NotFoundError('Пользователь с указанным id не найден'));
+        next(new errors.NotFoundError(userErrorMessages.ID_NOT_FOUND));
       } else {
         res.json(user);
       }
     })
     .catch((err: unknown) => {
       if (err instanceof MongoError.ValidationError) {
-        next(new errors.BadRequestError('Переданы некорректные данные для обновления профиля'));
+        next(new errors.BadRequestError(userErrorMessages.PROFILE_BAD_REQUEST));
       } else {
         next(new Error());
       }
@@ -82,14 +83,14 @@ export const updateAvatar = (req: Request, res: Response, next: NextFunction) =>
   User.findByIdAndUpdate(req.user?._id, { avatar }, { new: true, runValidators: true })
     .then((user) => {
       if (!user) {
-        next(new errors.NotFoundError('Пользователь с указанным id не найден'));
+        next(new errors.NotFoundError(userErrorMessages.ID_NOT_FOUND));
       } else {
         res.json(user);
       }
     })
     .catch((err: unknown) => {
       if (err instanceof MongoError.ValidationError) {
-        next(new errors.BadRequestError('Переданы некорректные данные для обновления аватара'));
+        next(new errors.BadRequestError(userErrorMessages.AVATAR_BAD_REQUEST));
       } else {
         next(new Error());
       }
