@@ -4,7 +4,7 @@
   "description": "Бэкенд проекта Место",
   "main": "dist/app.js",
   "scripts": {
-    "lint": "npx eslint --fix src/**/*.ts",
+    "lint": "npx eslint src/**/*.ts",
     "build": "tsc",
     "dev": "ts-node-dev src/app.ts",
     "start": "ts-node src/app.ts",
