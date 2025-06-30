@@ -22,6 +22,7 @@ router.put(
   validateRequest(
     validationSchemas.paramsSchema,
     cardErrorMessages.ID_BAD_REQUEST,
+    'params',
   ),
   controller.setLike,
 );
@@ -31,6 +32,7 @@ router.delete(
   validateRequest(
     validationSchemas.paramsSchema,
     cardErrorMessages.ID_BAD_REQUEST,
+    'params',
   ),
   controller.deleteCardById,
 );
@@ -39,6 +41,7 @@ router.delete(
   validateRequest(
     validationSchemas.paramsSchema,
     cardErrorMessages.ID_BAD_REQUEST,
+    'params',
   ),
   controller.unsetLike,
 );
